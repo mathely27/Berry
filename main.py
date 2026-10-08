@@ -34,10 +34,14 @@ result = berry.run_sync("Hello Berry!")
 print(result.output)
 
 
+history=[]
 while True:
     user_input = input("You: ")
     if user_input.lower() in ["exit", "quit", "bye"]:
         print("Berry: Bye bye! 🫐")
         break
-    result = berry.run_sync(user_input)
+    result=berry.run_sync(user_input,message_history=history)
+    history=result.all_messages()
+
+    # result = berry.run_sync(user_input)
     print(f"Berry: {result.output}")
