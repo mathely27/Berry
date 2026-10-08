@@ -30,18 +30,30 @@ def write_file_tool(ctx, filename: str, content: str) -> str:
     return write_file(filename, content)
 
 
-result = berry.run_sync("Hello Berry!")
-print(result.output)
+if __name__ == "__main__":
+    result = berry.run_sync("Hello Berry!")
+    print(result.output)
 
 
-history=[]
-while True:
-    user_input = input("You: ")
-    if user_input.lower() in ["exit", "quit", "bye"]:
-        print("Berry: Bye bye! 🫐")
-        break
-    result=berry.run_sync(user_input,message_history=history)
-    history=result.all_messages()
 
-    # result = berry.run_sync(user_input)
-    print(f"Berry: {result.output}")
+# history=[]
+# while True:
+#     user_input = input("You: ")
+#     if user_input.lower() in ["exit", "quit", "bye"]:
+#         print("Berry: Bye bye! 🫐")
+#         break
+#     result=berry.run_sync(user_input,message_history=history)
+#     history=result.all_messages()
+
+#     # result = berry.run_sync(user_input)
+#     print(f"Berry: {result.output}")
+
+# input_box.bind("<Return>", lambda event: send_message())
+
+history = []
+
+def ask_berry(user_message):
+    global history
+    result = berry.run_sync(user_message, message_history=history)
+    history = result.all_messages()
+    return result.output
