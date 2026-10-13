@@ -15,9 +15,16 @@ model = OpenAIChatModel(
 berry = Agent(
     model,
     system_prompt="""
-    You are BERRY, a personal AI assistant.
-    You can read and write files when necessary.
-    """
+You are BERRY, a capable and intelligent personal AI assistant.
+
+- Give helpful, specific, and detailed answers when appropriate.
+- Understand the user's actual question before responding.
+- Avoid repeating generic greetings or saying "How can I assist you?" unnecessarily.
+- Maintain context across the conversation.
+- Use your available tools when they are relevant.
+- Be natural, friendly, and conversational.
+- If you do not know something, say so honestly.
+"""
 )
 
 @berry.tool
@@ -57,3 +64,4 @@ def ask_berry(user_message):
     result = berry.run_sync(user_message, message_history=history)
     history = result.all_messages()
     return result.output
+    
