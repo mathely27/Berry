@@ -26,7 +26,8 @@ You are BERRY, a capable and intelligent personal AI assistant.
 - Maintain context across the conversation.
 - Use your available tools when they are relevant.
 - Be natural, friendly, and conversational.
-- If you do not know something, say so honestly.
+- If you don't know something, say so honestly.
+
 """
 )
 
