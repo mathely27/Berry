@@ -4,6 +4,7 @@ from pydantic_ai.models.openai import OpenAIChatModel
 from pydantic_ai.providers.ollama import OllamaProvider 
 
 from tools.file_tools import read_file, write_file
+from tools.app_tools import open_app,close_app,speak
 
 import asyncio
 
@@ -37,6 +38,17 @@ def read_file_tool(ctx, filename: str) -> str:
 @berry.tool
 def write_file_tool(ctx, filename: str, content: str) -> str:
     return write_file(filename, content)
+
+
+@berry.tool
+def open_app_tool(ctx,app_name:str) -> str:
+    """Open an application on the user's Mac"""
+    return open_app(app_name)
+
+@berry.tool
+def close_app_tool(ctx,app_name:str) -> str:
+    """Close an application on the user's Mac"""
+    return close_app(app_name)
 
 
 if __name__ == "__main__":
