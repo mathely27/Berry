@@ -1,3 +1,4 @@
+from PySide6.QtGui import QTextCursor
 import sys 
 import asyncio
 from main import stream_berry
@@ -14,17 +15,15 @@ class BerryWorker(QThread):
         super().__init__()
         self.message = message
 
-    def run(self):
-        async def process():
-            async for chunk in stream_berry(self.message):
-                self.chunk_received.emit(chunk)
+    async def get_reply(self):
+        async for chunk in stream_berry(self.message):
+            self.chunk_received.emit(chunk)
 
+    def run(self):                  #runsin the background
         try:
-            asyncio.run(process())
+            asyncio.run(self.get_reply())
         except Exception as e:
             self.error_occurred.emit(str(e))
-        finally:
-            self.finished_response.emit()
 
 app=QApplication(sys.argv)
 window=QWidget()
@@ -69,52 +68,42 @@ input_box.setPlaceholderText("Message BERRY...")
 input_box.setGeometry(30,450,600,45)    
 
 
-current_worker=None
-def append_chunk(chunk):
-    cursor=chat_area.textCursor()
-    cursor.movePosition(cursor.MoveOperation.End)
-    cursor.insertText(chunk)
-    chat_area.setTextCursor(cursor)
+worker = None   
+
+def show_chunk(chunk):
+    chat_area.moveCursor(QTextCursor.MoveOperation.End)
+    chat_area.insertPlainText(chunk)
     chat_area.ensureCursorVisible()
 
-def finished_response():
-    global current_worker
-    button.setEnabled(True)
+
+def enable_input():
     input_box.setEnabled(True)
-
+    button.setEnabled(True)
     input_box.setFocus()
-
-    current_worker = None
-
 
 
 def send_message():
-    global current_worker
-
+    global worker
     message = input_box.text().strip()
-    if not message or current_worker is not None:
+    if not message:
         return
 
     chat_area.append(f"You: {message}")
     chat_area.append("BERRY: ")
 
     input_box.clear()
-    input_box.setEnabled(False)
+    input_box.setEnabled(False)     
     button.setEnabled(False)
 
-    current_worker = BerryWorker(message)
-    current_worker.chunk_received.connect(append_chunk)
-    current_worker.error_occurred.connect(
-        lambda error: append_chunk(f"\nError: {error}")
-    )
-    current_worker.finished_response.connect(finished_response)
-    current_worker.start()
+    worker = BerryWorker(message)
+    worker.chunk_received.connect(show_chunk)
+    worker.error_occurred.connect(lambda e: show_chunk(f"\nError: {e}"))
+    worker.finished.connect(enable_input)   
+    worker.start()
+
 
 button.clicked.connect(send_message)
 input_box.returnPressed.connect(send_message)
 
-
 window.show()
 sys.exit(app.exec())
-
-
