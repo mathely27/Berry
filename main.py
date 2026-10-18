@@ -5,10 +5,12 @@ from pydantic_ai.providers.ollama import OllamaProvider
 
 from tools.file_tools import read_file, write_file
 
+import asyncio
+
 model = OpenAIChatModel(
     "qwen3:latest",
     provider=OllamaProvider(
-        base_url="http://localhost:11434/v1"
+        base_url="http://127.0.0.1:11434/v1"
     )
 )
 
@@ -62,6 +64,22 @@ history = []
 def ask_berry(user_message):
     global history
     result = berry.run_sync(user_message, message_history=history)
+# run_sync() response complete hone tak wait karta hai. Isliye isko synchronous call kehte hain.
     history = result.all_messages()
     return result.output
     
+
+
+# STREAMINGGGGGGGGGGGGG
+async def stream_berry(user_message):
+    global history
+    buffer=""
+
+    async with berry.run_stream(
+        user_message,message_history=history
+    )as result:
+        async for chunk in result.stream_text(delta=True):
+            buffer+=chunk
+            yield chunk
+        history=result.all_messages()
+# Yahan delta=True ka matlab hai ki stream se naya text incrementally receive karna, na ki har baar ab tak ka poora accumulated response.
