@@ -51,6 +51,11 @@ def close_app_tool(ctx,app_name:str) -> str:
     return close_app(app_name)
 
 
+@berry.tool
+def speak_tool(ctx,text:str)->str:
+    """Speak the given text out loud"""
+    return speak(text)
+
 if __name__ == "__main__":
     result = berry.run_sync("Hello Berry!")
     print(result.output)
